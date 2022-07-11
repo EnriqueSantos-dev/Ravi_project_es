@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model cliente {
+  id_cliente Int    @id @default(autoincrement())
+  cpf        String @unique
+  nome       String
+
+  cliente_caderno_comprar cliente_caderno_comprar[]
+}
+
+model caderno {
+  id                      Int                       @id @default(autoincrement())
+  codigo                  Int                       @unique
+  valor                   Float
+  caderno_uma_materia     Boolean?
+  caderno_dez_materias    Boolean?
+  capa                    capa                      @relation(fields: [id_capaFK], references: [id_capa])
+  id_capaFK               Int
+  cliente_caderno_comprar cliente_caderno_comprar[]
+}
+
+model capa {
+  id_capa Int       @id @default(autoincrement())
+  codigo  String    @unique
+  nome    String
+  caderno caderno[]
+}
+
+model cliente_caderno_comprar {
+  data         DateTime
+  cliente      cliente  @relation(fields: [id_clienteFK], references: [id_cliente])
+  id_clienteFK Int
+
+  caderno   caderno @relation(fields: [cadernoId], references: [id])
+  cadernoId Int
+
+  @@id([id_clienteFK, cadernoId, data])
+}
